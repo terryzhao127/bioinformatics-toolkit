@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}K operation{% endblock %}
+
+{% block jumbotron_title %}K Operation{% endblock %}
+{% block jumbotron_subtitle %}Input the string and operand perform K operation: (use lowercase){% endblock %}
+
+{% block content %}
+    <form action="/koperation/result/" method="post">
+        {% csrf_token %}
+        <div class="btn-group margin-bottom-2" data-toggle="buttons">
+            <label class="btn btn-primary active">
+                <input type="radio" name="mode" value="0" id="mode-0" autocomplete="off" checked
+                       onchange="change_input_field_mode()"> Prefix Mode
+            </label>
+            <label class="btn btn-primary">
+                <input type="radio" name="mode" value="1" id="mode-1" autocomplete="off"
+                       onchange="change_input_field_mode()"> Suffix Mode
+            </label>
+            <label class="btn btn-primary">
+                <input type="radio" name="mode" value="2" id="mode-2" autocomplete="off"
+                       onchange="change_input_field_mode()"> Interval Mode
+            </label>
+        </div>
+        <div class="form-group text-left">
+            <label for="op-str">String:</label>
+            <input id="op-str" class="form-control" type="text" name="string" pattern="[actg]+" required/>
+        </div>
+        <div class="form-group text-left">
+            <label for="operand-1">Operand 1:</label>
+            <input id="operand-1" class="form-control" type="number" name="num_1" min="0" step="1" required/>
+        </div>
+        <div class="form-group text-left">
+            <label for="operand-2">Operand 2:</label>
+            <input id="operand-2" class="form-control" type="number" name="num_2" min="0" step="1" required/>
+        </div>
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block additional_scripts %}
+    <script>
+        function change_input_field_mode() {
+            var operand_2_filed = document.getElementById("operand-2");
+            if ($('input[name="mode"]:checked').val() === '2') {
+                operand_2_filed.disabled = false;
+            } else {
+                operand_2_filed.disabled = true;
+                operand_2_filed.value = '';
+            }
+        }
+        window.onload = change_input_field_mode();
+    </script>
+{% endblock %}

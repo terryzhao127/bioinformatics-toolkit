@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Bioinformatics Toolkit{% endblock %}
+
+{% block jumbotron_title %}Welcome!{% endblock %}
+{% block jumbotron_subtitle %}This is a toolkit containing serveral tools built for bioinformatic
+    research.{% endblock %}
+
+{% block content %}
+        <div class="container text-left">
+            <h3>Now available tools:</h3>
+            <div class="list-group text-center">
+                <a href="/koperation" class="list-group-item">K Operation</a>
+                <a href="/fasta" class="list-group-item">Fasta Alignment</a>
+                <a href="/boxplot" class="list-group-item">Box Plot Graph</a>
+            </div>
+        </div>
+{% endblock %}

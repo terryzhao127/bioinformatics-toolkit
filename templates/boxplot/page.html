@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Box Plot{% endblock %}
+
+{% block jumbotron_title %}Box Plot{% endblock %}
+{% block jumbotron_subtitle %}Input two strings and required parameters to get their box-plot graph:{% endblock %}
+
+{% block content %}
+    <form action="/boxplot/result/" method="post" class="text-left">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="op-str-1">String 1:</label>
+            <input id="op-str-1" class="form-control" type="text" name="string_1" pattern="[acgt]+" required/>
+        </div>
+        <div class="form-group">
+            <label for="op-str-2">String 2:</label>
+            <input id="op-str-2" class="form-control" type="text" name="string_2" pattern="[acgt]+" required/>
+        </div>
+        <div class="form-group">
+            <label for="window-size">The size of window:</label>
+            <input id="window-size" class="form-control" type="number" name="window_size" min="1" step="2" required/>
+        </div>
+        <div class="form-group">
+            <label for="move-step">Step:</label>
+            <input id="move-step" class="form-control" type="number" name="move_step" min="1" step="1" required/>
+        </div>
+        <div class="form-group">
+            <label for="stringency">Stringency:</label>
+            <input id="stringency" class="form-control" type="number" name="stringency" min="1" step="1" required/>
+        </div>
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+{% endblock %}

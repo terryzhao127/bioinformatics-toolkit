@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}FASTA Result{% endblock %}
+
+{% block jumbotron_title %}Result of FASTA Alignment{% endblock %}
+{% block jumbotron_subtitle %}Followings are position table of string 1, the offset table of string 2 and the offset
+    through which K bases are matched: {% endblock %}
+
+{% block content %}
+    <h3>The Position Table:</h3>
+    <div style="overflow: auto">
+        <table class="table">
+            <thead>
+            <tr>
+                {% for position_tuple in positions_table.items %}
+                    <th class="text-center">{{ position_tuple.0.upper }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tr>
+                {% for position_tuple in positions_table.items %}
+                    <td>
+                        {% for pos in position_tuple.1 %}
+                            <span>{{ pos }}&nbsp;</span>
+                        {% endfor %}
+                    </td>
+                {% endfor %}
+            </tr>
+        </table>
+    </div>
+    <h3>The Offsets Table:</h3>
+    <div style="overflow: auto">
+        <table class="table">
+            <thead>
+            <tr>
+                {% for offset_single_tuple in offsets_table %}
+                    <th class="text-center">{{ offset_single_tuple.0.upper }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tr>
+                {% for offsets_single_base in offsets_table %}
+                    <td>
+                        {% if offsets_single_base %}
+                            <span>None</span>
+                        {% else %}
+                            {% for offset in offsets_single_base.1 %}
+                                <span>{{ offset }}&nbsp;</span>
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+        </table>
+    </div>
+
+    <h3>The offset through which most bases tuple are matched is:</h3>
+    {% if result_offsets %}
+        {% for offset in result_offsets %}
+            <span class="lead">{{ offset }}&nbsp;</span>
+        {% endfor %}
+    {% else %}
+        <em class="lead">It does not exist!</em>
+    {% endif %}
+{% endblock %}
