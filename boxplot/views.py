@@ -2,10 +2,12 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 import matplotlib
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import io
+
 
 # Create your views here.
 
@@ -15,8 +17,8 @@ def get_page(request):
 
 
 def get_result_page(request):
-    string_1 = request.POST['string_1']
-    string_2 = request.POST['string_2']
+    string_1 = request.POST['string_1'].upper()
+    string_2 = request.POST['string_2'].upper()
 
     window_size = request.POST['window_size']
     if window_size is not None and window_size != '':
@@ -35,23 +37,6 @@ def get_result_page(request):
     request.session['move_step'] = move_step
     request.session['stringency'] = stringency
 
-    return render(request, 'boxplot/result.html')
-
-
-def box_plot_graph(request):
-    string_1 = request.session['string_1']
-    string_2 = request.session['string_2']
-
-    window_size = request.session['window_size']
-    if window_size is not None and window_size != '':
-        window_size = int(window_size)
-    move_step = request.session['move_step']
-    if move_step is not None and move_step != '':
-        move_step = int(move_step)
-    stringency = request.session['stringency']
-    if stringency is not None and stringency != '':
-        stringency = int(stringency)
-
     box_plot_graph = [[0 for x in range(len(string_2))] for y in range(len(string_1))]
     align_offset = int((window_size - 1) / 2)
     for index_1 in range(0, len(string_1) - (window_size - 1), move_step):
@@ -62,9 +47,71 @@ def box_plot_graph(request):
                 box_plot_graph[index_1 + align_offset][index_2 + align_offset] = 1
             else:
                 box_plot_graph[index_1 + align_offset][index_2 + align_offset] = 0
+    request.session['box_plot_graph'] = box_plot_graph
+
+    # Get a list of motifs
+    motifs = []
+    for index_1 in range(len(string_1)):
+        is_motif_found = False
+
+        # Get the max times of iteration.
+        motif_length = 0
+        if len(string_1) - index_1 <= len(string_2):
+            loop_length = len(string_1) - index_1
+        else:
+            loop_length = len(string_2)
+
+        for offset in range(loop_length):
+            if box_plot_graph[index_1 + offset][offset]:
+                if not is_motif_found:
+                    is_motif_found = True
+                motif_length += 1
+            else:
+                if is_motif_found:
+                    temp_str_1 = string_1[
+                                 index_1 + offset - motif_length - align_offset:index_1 + offset + align_offset]
+                    temp_str_2 = string_2[offset - motif_length - align_offset:offset + align_offset]
+                    motifs.append([temp_str_1, temp_str_2])
+                    is_motif_found = False
+                    motif_length = 0
+
+    for index_2 in range(1, len(string_2)):
+        is_motif_found = False
+
+        # Get the max times of iteration.
+        motif_length = 0
+        if len(string_2) - index_2 <= len(string_1):
+            loop_length = len(string_2) - index_2
+        else:
+            loop_length = len(string_1)
+
+        for offset in range(loop_length):
+            if box_plot_graph[offset][index_2 + offset]:
+                if not is_motif_found:
+                    is_motif_found = True
+                motif_length += 1
+            else:
+                if is_motif_found:
+                    temp_str_1 = string_1[offset - motif_length - align_offset:offset + align_offset]
+                    temp_str_2 = string_2[
+                                 index_2 + offset - motif_length - align_offset:index_2 + offset + align_offset]
+                    motifs.append([temp_str_1, temp_str_2])
+                    is_motif_found = False
+                    motif_length = 0
+
+    result = {
+        'motifs': motifs,
+    }
+    return render(request, 'boxplot/result.html', result)
+
+
+def get_graph(request):
+    string_1 = request.session['string_1']
+    string_2 = request.session['string_2']
+    box_plot_graph = request.session['box_plot_graph']
 
     # Create plot graph
-    string_1_ticks = [x.upper() for x in string_1]
+    string_1_ticks = [x.upper() for x in request.session['string_1']]
     string_2_ticks = [x.upper() for x in string_2]
 
     buf = io.BytesIO()

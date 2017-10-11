@@ -6,5 +6,22 @@
 {% block jumbotron_subtitle %}The generated box-plot graph is:{% endblock %}
 
 {% block content %}
-<img src="/boxplot/result/get-graph/" class="img-fluid" alt="Fail"/>
+    <img src="/boxplot/result/get-graph/" class="img-fluid" alt="Fail"/>
+    <h3>The motifs are:</h3>
+    <table class="table">
+        <thead>
+        <tr>
+            <th class="text-center">Index</th>
+            <th class="text-center">Motif on String 1</th>
+            <th class="text-center">Motif on String 2</th>
+        </tr>
+        </thead>
+        {% for motif in motifs %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ motif.0 }}</td>
+                <td>{{ motif.1 }}</td>
+            </tr>
+        {% endfor %}
+    </table>
 {% endblock %}
