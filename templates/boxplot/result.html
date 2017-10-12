@@ -8,20 +8,22 @@
 {% block content %}
     <img src="/boxplot/result/get-graph/" class="img-fluid" alt="Fail"/>
     <h3>The motifs are:</h3>
-    <table class="table">
-        <thead>
-        <tr>
-            <th class="text-center">Index</th>
-            <th class="text-center">Motif on String 1</th>
-            <th class="text-center">Motif on String 2</th>
-        </tr>
-        </thead>
-        {% for motif in motifs %}
+    <div style="overflow: auto;">
+        <table class="table">
+            <thead>
             <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ motif.0 }}</td>
-                <td>{{ motif.1 }}</td>
+                <th class="text-center">Index</th>
+                <th class="text-center">Motif on String 1</th>
+                <th class="text-center">Motif on String 2</th>
             </tr>
-        {% endfor %}
-    </table>
+            </thead>
+            {% for motif in motifs %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ motif.0 }}</td>
+                    <td>{{ motif.1 }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
 {% endblock %}

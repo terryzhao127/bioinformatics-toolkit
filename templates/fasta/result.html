@@ -41,7 +41,7 @@
             <tr>
                 {% for offsets_single_base in offsets_table %}
                     <td>
-                        {% if offsets_single_base %}
+                        {% if not offsets_single_base.1 %}
                             <span>None</span>
                         {% else %}
                             {% for offset in offsets_single_base.1 %}

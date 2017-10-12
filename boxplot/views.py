@@ -2,11 +2,13 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 import matplotlib
-
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
+# import matplotlib.lines as mlines
+
 import io
+
+matplotlib.pyplot.switch_backend('Agg')
 
 
 # Create your views here.
@@ -99,6 +101,8 @@ def get_result_page(request):
                     is_motif_found = False
                     motif_length = 0
 
+    # Sort motifs by length.
+    motifs.sort(key=lambda item: len(item[0]), reverse=True)
     result = {
         'motifs': motifs,
     }
@@ -120,6 +124,35 @@ def get_graph(request):
         for y in range(len(string_2)):
             if box_plot_graph[x][y]:
                 plt.plot(x, y, '.k')
+
+    # # Draw lines.
+    # for index_1 in range(len(box_plot_graph)):
+    #     is_line_found = False
+    #
+    #     # Get the max times of iteration.
+    #     line_length = 0
+    #     if len(box_plot_graph) - index_1 <= len(box_plot_graph[0]):
+    #         loop_length = len(string_1) - index_1
+    #     else:
+    #         loop_length = len(string_2)
+    #
+    #     start_point = []
+    #     end_point = []
+    #     for offset in range(loop_length):
+    #         if box_plot_graph[index_1 + offset][offset]:
+    #             if not is_line_found:
+    #                 is_line_found = True
+    #                 start_point.append(index_1)
+    #                 start_point.append(index_1 + offset)
+    #             line_length += 1
+    #         else:
+    #             if is_line_found:
+    #                 end_point.append(index_1 + offset - 1)
+    #                 end_point.append(offset - 1)
+    #                 __newline(start_point, end_point)
+    #                 is_line_found = False
+    #                 line_length = 0
+
     x = np.array(list(range(len(string_1))))
     y = np.array(list(range(len(string_2))))
     plt.xticks(x, string_1_ticks)
@@ -135,6 +168,7 @@ def get_graph(request):
     del request.session['window_size']
     del request.session['move_step']
     del request.session['stringency']
+    del request.session['box_plot_graph']
 
     return response
 
@@ -147,3 +181,19 @@ def __compare_string(string_1, string_2, stringency):
         if mismatch_char > len(string_1) - stringency:
             return False
     return True
+
+
+def __newline(p1, p2):
+    ax = plt.gca()
+    xmin, xmax = ax.get_xbound()
+
+    if(p2[0] == p1[0]):
+        xmin = xmax = p1[0]
+        ymin, ymax = ax.get_ybound()
+    else:
+        ymax = p1[1]+(p2[1]-p1[1])/(p2[0]-p1[0])*(xmax-p1[0])
+        ymin = p1[1]+(p2[1]-p1[1])/(p2[0]-p1[0])*(xmin-p1[0])
+
+    l = mlines.Line2D([xmin,xmax], [ymin,ymax])
+    ax.add_line(l)
+    return l

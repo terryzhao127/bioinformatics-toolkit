@@ -56,7 +56,4 @@ def fasta(request):
         'matched_base_number': k_parameter,
     }
 
-    # result_list = [positions, offsets, result_offsets, string_2, matched_base_number]
-    # result = dict([(x.__name__, x) for x in result_list])
-
     return render(request, 'fasta/result.html', result)
