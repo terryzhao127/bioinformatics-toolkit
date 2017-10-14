@@ -19,6 +19,10 @@
     <!-- Additional Style -->
     {% block additional_stylesheets %}{% endblock %}
 
+    <!-- Favicon -->
+    <link rel="icon"
+          type="image/png"
+          href="{% static 'favicon.png' %}">
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
@@ -31,11 +35,11 @@
                         class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#"><i class="fa fa-github"
+                <a class="nav-link" href="https://github.com/ANDI-Mckee/Bioinformatics-Toolkit"><i class="fa fa-github"
                                                 aria-hidden="true"></i>Github</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#"><i class="fa fa-bug"
+                <a class="nav-link" href="https://github.com/ANDI-Mckee/Bioinformatics-Toolkit/issues/new"><i class="fa fa-bug"
                                                 aria-hidden="true"></i>Report
                     Bugs</a>
             </li>
