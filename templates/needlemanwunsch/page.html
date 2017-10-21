@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}FASTA Alignment{% endblock %}
+
+{% block jumbotron_title %}Needleman-Wunsch Algorithm{% endblock %}
+{% block jumbotron_subtitle %}Please fill required fields: (use lowercase){% endblock %}
+
+{% block content %}
+    <form action="/needlemanwunsch/result/" method="post" class="text-left">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="op-str-1">String 1:</label>
+            <input id="op-str-1" class="form-control" type="text" name="string_1" pattern="[acgt]+" required/>
+        </div>
+        <div class="form-group">
+            <label for="op-str-2">String 2:</label>
+            <input id="op-str-2" class="form-control" type="text" name="string_2" pattern="[acgt]+" required/>
+        </div>
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+{% endblock %}

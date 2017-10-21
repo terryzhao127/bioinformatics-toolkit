@@ -7,8 +7,7 @@ def get_page(request):
     return render(request, 'koperation/page.html')
 
 
-def k_operation(request):
-    # TODO: Validation
+def algorithm(request):
     mode = request.POST['mode']
     mode = int(mode)
     string = request.POST['string']

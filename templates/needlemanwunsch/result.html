@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}NW Algorithm Result{% endblock %}
+
+{% block jumbotron_title %}Result of Needleman-Wunsch Algorithm{% endblock %}
+{% block jumbotron_subtitle %}
+{% endblock %}
+
+{% block content %}
+    <div style="overflow: auto">
+        <table class="table">
+            <thead>
+            <tr>
+                <th></th>
+                {% for head in string_1 %}
+                    <th class="text-center">{{ head.upper }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            {% for row in processed_matrix %}
+                <tr>
+
+                    {% for score in row %}
+                        {% if forloop.counter0 == 0 %}
+                            <th class="text-center">
+                                {{ score.upper }}
+                            </th>
+                        {% else %}
+                            <td>{{ score }}</td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

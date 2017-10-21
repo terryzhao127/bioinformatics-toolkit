@@ -7,7 +7,7 @@ def get_page(request):
     return render(request, 'fasta/page.html')
 
 
-def fasta(request):
+def algorithm(request):
     string_1 = request.POST['string_1']
     string_2 = request.POST['string_2']
     k_parameter = request.POST['k_tuple']
@@ -17,7 +17,6 @@ def fasta(request):
     positions_table = {}
 
     # Build position table.
-    # TODO: Validation
     for index, base in enumerate(string_1):
         if index + k_parameter > len(string_1):
             break
@@ -48,7 +47,6 @@ def fasta(request):
     # Get the most occurring offset.
     result_offsets = [k for k, v in offsets_frequency.items() if v == max(offsets_frequency.values())]
 
-    # TODO: Get rid of HARD CODE.
     result = {
         'positions_table': positions_table,
         'offsets_table': offsets_table,

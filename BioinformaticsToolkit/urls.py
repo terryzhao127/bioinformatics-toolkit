@@ -22,5 +22,6 @@ urlpatterns = [
     url(r'^koperation/', include('koperation.urls')),
     url(r'^fasta/', include('fasta.urls')),
     url(r'^boxplot/', include('boxplot.urls')),
+    url(r'^needlemanwunsch/', include('needlemanwunsch.urls')),
     url(r'^admin/', admin.site.urls),
 ]

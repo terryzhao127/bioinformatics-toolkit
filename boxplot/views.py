@@ -4,21 +4,18 @@ from django.http import HttpResponse
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-# import matplotlib.lines as mlines
 
 import io
 
 matplotlib.pyplot.switch_backend('Agg')
 
-
 # Create your views here.
-
 
 def get_page(request):
     return render(request, 'boxplot/page.html')
 
 
-def get_result_page(request):
+def algorithm(request):
     string_1 = request.POST['string_1'].upper()
     string_2 = request.POST['string_2'].upper()
 
