@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}SW Algorithm Result{% endblock %}
+
+{% block jumbotron_title %}Result of Smith-Waterman Algorithm{% endblock %}
+{% block jumbotron_subtitle %}
+    Below is the score matrix of Smith-Waterman Algorithm.The colored blocks represent the trace of alignments.
+{% endblock %}
+
+{% block content %}
+    <div style="overflow: auto">
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th></th>
+                {% for head in string_1 %}
+                    <th class="text-center">{{ head.upper }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            {% for row in processed_matrix %}
+                <tr>
+                    {% for score in row %}
+                        {% if forloop.counter0 == 0 %}
+                            <th class="text-center">
+                                {{ score.upper }}
+                            </th>
+                        {% else %}
+                            {% if score.1 == True %}
+                                <td style="background-color: #F0F0F0;">{{ score.0 }}</td>
+                            {% else %}
+                                <td>{{ score.0 }}</td>
+                            {% endif %}
+
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <h3>The best alignments are:</h3>
+    <div style="overflow: auto;">
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th class="text-center">Index</th>
+                <th class="text-center">Alignment Result</th>
+            </tr>
+            </thead>
+            {% for colored_alignment in colored_alignments %}
+                <tr>
+                    <td class="align-middle">{{ forloop.counter }}</td>
+                    <td class="align-middle">
+                        <table class="table table-bordered">
+                            <tr>
+                                {% for point in colored_alignment %}
+                                    {% if point.2.value == 1 %}
+                                        <td style="background-color: palegreen">{{ point.0.upper }}</td>
+                                    {% elif point.2.value == 2 %}
+                                        <td style="background-color: orangered">{{ point.0.upper }}</td>
+                                    {% else %}
+                                        <td style="background-color: yellow">{{ point.0.upper }}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                {% for point in colored_alignment %}
+                                    {% if point.2.value == 1 %}
+                                        <td style="background-color: palegreen">{{ point.1.upper }}</td>
+                                    {% elif point.2.value == 2 %}
+                                        <td style="background-color: orangered">{{ point.1.upper }}</td>
+                                    {% else %}
+                                        <td style="background-color: yellow">{{ point.1.upper }}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

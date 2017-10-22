@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}NW Algorithm{% endblock %}
+{% block title %}SW Algorithm{% endblock %}
 
-{% block jumbotron_title %}Needleman-Wunsch Algorithm{% endblock %}
+{% block jumbotron_title %}Smith-Waterman Algorithm{% endblock %}
 {% block jumbotron_subtitle %}Please fill required fields: (use lowercase){% endblock %}
 
 {% block content %}
-    <form action="/needlemanwunsch/result/" method="post" class="text-left">
+    <form action="/smithwaterman/result/" method="post" class="text-left">
         {% csrf_token %}
         <div class="form-group">
             <label for="op-str-1">String 1:</label>

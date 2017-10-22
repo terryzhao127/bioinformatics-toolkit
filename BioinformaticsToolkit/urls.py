@@ -15,13 +15,15 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.shortcuts import redirect
 
 urlpatterns = [
-    url(r'^', include('index.urls')),
+    url(r'^$', lambda r: redirect('/index/')),
     url(r'^index/', include('index.urls')),
     url(r'^koperation/', include('koperation.urls')),
     url(r'^fasta/', include('fasta.urls')),
     url(r'^boxplot/', include('boxplot.urls')),
     url(r'^needlemanwunsch/', include('needlemanwunsch.urls')),
+    url(r'^smithwaterman/', include('smithwaterman.urls')),
     url(r'^admin/', admin.site.urls),
 ]

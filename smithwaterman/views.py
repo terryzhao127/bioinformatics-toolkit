@@ -66,7 +66,7 @@ class __AlignType(Enum):
 
 
 def get_page(request):
-    return render(request, 'needlemanwunsch/page.html')
+    return render(request, 'smithwaterman/page.html')
 
 
 def algorithm(request):
@@ -77,13 +77,13 @@ def algorithm(request):
     # Initialize the first element with 0.
     score_matrix[0][0] = 0
 
-    # Initialize the first row.
+    # Initialize the first row with 0.
     for i in range(1, len(score_matrix[0])):
-        score_matrix[0][i] = score_matrix[0][i - 1] + ALIGN_GAP
+        score_matrix[0][i] = 0
 
-    # Initialize the first column.
+    # Initialize the first column with 0.
     for i in range(1, len(score_matrix)):
-        score_matrix[i][0] = score_matrix[i - 1][0] + ALIGN_GAP
+        score_matrix[i][0] = 0
 
     # Calculate the score matrix.
     for row in range(1, len(score_matrix)):
@@ -91,13 +91,25 @@ def algorithm(request):
             match_score = BLOSUM_62[string_2[row - 1]][string_1[col - 1]] + score_matrix[row - 1][col - 1]
             gap_from_above = score_matrix[row - 1][col] + ALIGN_GAP
             gap_from_left = score_matrix[row][col - 1] + ALIGN_GAP
-            score_matrix[row][col] = max(match_score, gap_from_above, gap_from_left)
+            score_matrix[row][col] = max(match_score, gap_from_above, gap_from_left, 0)
 
-    # Traceback to find the best alignment (using BFS).
+    # Traceback to find the best partly alignment.
+
+    # Find the start point.
+    maximum = -1
+    start_point = 0, 0
+    for row in range(len(string_2)):
+        for col in range(len(string_1)):
+            if score_matrix[row][col] > maximum:
+                start_point = row, col
+                maximum = score_matrix[row][col]
+
     colored_matrix = [[(col, False) for col in row] for row in score_matrix]
-    paths_queue = [((len(string_2), len(string_1)), '', '')]
+    colored_matrix[start_point[0]][start_point[1]] = colored_matrix[start_point[0]][start_point[1]][0], True
+
+    # Find until mismatch was found.
+    paths_queue = [((start_point[0], start_point[1]), '', '')]
     alignments = []
-    colored_matrix[len(string_2)][len(string_1)] = (colored_matrix[len(string_2)][len(string_1)][0], True)
     while True:
         if len(paths_queue) == 0:
             break
@@ -107,7 +119,7 @@ def algorithm(request):
         temp_pos = temp_align_point[0]
 
         # End
-        if temp_pos == (0, 0):
+        if score_matrix[temp_pos[0]][temp_pos[1]] == 0:
             alignment = (temp_string_1, temp_string_2)
             alignments.append(alignment)
             continue
@@ -165,4 +177,4 @@ def algorithm(request):
         'colored_alignments': colored_alignments
     }
 
-    return render(request, 'needlemanwunsch/result.html', result)
+    return render(request, 'smithwaterman/result.html', result)
