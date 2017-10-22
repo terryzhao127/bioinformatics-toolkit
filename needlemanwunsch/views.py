@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from enum import Enum
 
 # Create your views here.
 
@@ -55,6 +56,12 @@ BLOSUM_62 = {
 ALIGN_GAP = -4
 
 
+class __AlignType(Enum):
+    MATCH = 1
+    MISMATCH = 2
+    GAP = 3
+
+
 def get_page(request):
     return render(request, 'needlemanwunsch/page.html')
 
@@ -85,18 +92,76 @@ def algorithm(request):
             gap_from_left = score_matrix[row][col - 1] + ALIGN_GAP
             score_matrix[row][col] = max(match_score, gap_from_above, gap_from_left)
 
+    # Traceback to find the best alignment (using DFS).
+    colored_matrix = [[(col, False) for col in row] for row in score_matrix]
+    paths_queue = [((len(string_2), len(string_1)), '', '')]
+    alignments = []
+    colored_matrix[len(string_2)][len(string_1)] = (colored_matrix[len(string_2)][len(string_1)][0], True)
+    while True:
+        if len(paths_queue) == 0:
+            break
+        temp_align_point = paths_queue.pop(0)
+        temp_string_1 = temp_align_point[1]
+        temp_string_2 = temp_align_point[2]
+        temp_pos = temp_align_point[0]
+
+        # End
+        if temp_pos == (0, 0):
+            alignment = (temp_string_1, temp_string_2)
+            alignments.append(alignment)
+            continue
+
+        # Three cases:
+        row, col = temp_pos
+        if row - 1 >= 0 and score_matrix[row - 1][col] == score_matrix[row][col] - ALIGN_GAP:
+            colored_matrix[row - 1][col] = (colored_matrix[row - 1][col][0], True)
+            new_string_1 = '-' + temp_string_1
+            new_string_2 = string_2[row - 1] + temp_string_2
+            new_pos = temp_pos[0] - 1, temp_pos[1]
+            new_align_point = (new_pos, new_string_1, new_string_2)
+            paths_queue.append(new_align_point)
+        if col - 1 >= 0 and score_matrix[row][col - 1] == score_matrix[row][col] - ALIGN_GAP:
+            colored_matrix[row][col - 1] = (colored_matrix[row][col - 1][0], True)
+            new_string_1 = string_1[col - 1] + temp_string_1
+            new_string_2 = '-' + temp_string_2
+            new_pos = temp_pos[0], temp_pos[1] - 1
+            new_align_point = (new_pos, new_string_1, new_string_2)
+            paths_queue.append(new_align_point)
+        if row - 1 >= 0 and col - 1 >= 0 and score_matrix[row - 1][col - 1] == score_matrix[row][col] - \
+                BLOSUM_62[string_2[row - 1]][string_1[col - 1]]:
+            colored_matrix[row - 1][col - 1] = (colored_matrix[row - 1][col - 1][0], True)
+            new_string_1 = string_1[col - 1] + temp_string_1
+            new_string_2 = string_2[row - 1] + temp_string_2
+            new_pos = temp_pos[0] - 1, temp_pos[1] - 1
+            new_align_point = (new_pos, new_string_1, new_string_2)
+            paths_queue.append(new_align_point)
+
+    # Color alignments.
+    colored_alignments = []
+    for alignment in alignments:
+        colored_alignment = []
+        for ch1, ch2 in zip(alignment[0], alignment[1]):
+            if ch1 == ch2:
+                colored_alignment.append((ch1, ch2, __AlignType.MATCH))
+            elif ch1 == '-' or ch2 == '-':
+                colored_alignment.append((ch1, ch2, __AlignType.GAP))
+            else:
+                colored_alignment.append((ch1, ch2, __AlignType.MISMATCH))
+        colored_alignments.append(colored_alignment)
+
     # Procession for django template.
     string_1 = '*' + string_1
     string_2 = '*' + string_2
     processed_matrix = []
-    for row, ch in zip(score_matrix, string_2):
+    for row, ch in zip(colored_matrix, string_2):
         temp = row[:]
         temp.insert(0, ch)
         processed_matrix.append(tuple(temp))
     result = {
-        'string_1' : string_1,
-        'string_2' : string_2,
-        'processed_matrix' : processed_matrix,
+        'string_1': string_1,
+        'string_2': string_2,
+        'processed_matrix': processed_matrix,
+        'colored_alignments': colored_alignments
     }
 
     return render(request, 'needlemanwunsch/result.html', result)
