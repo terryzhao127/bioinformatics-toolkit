@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from BioinformaticsToolkit import utils
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -11,13 +12,21 @@ matplotlib.pyplot.switch_backend('Agg')
 
 # Create your views here.
 
+
 def get_page(request):
     return render(request, 'boxplot/page.html')
 
 
 def algorithm(request):
-    string_1 = request.POST['string_1'].upper()
-    string_2 = request.POST['string_2'].upper()
+    # Read in fasta files
+    records_1 = utils.get_fasta_from_file(request.FILES['file_1'])
+    records_2 = utils.get_fasta_from_file(request.FILES['file_2'])
+    string_1 = None
+    string_2 = None
+    for record in records_1:
+        string_1 = record[1]
+    for record in records_2:
+        string_2 = record[1]
 
     window_size = request.POST['window_size']
     if window_size is not None and window_size != '':

@@ -93,3 +93,20 @@
 .margin-bottom-2 {
     margin-bottom: 2em;
 }
+
+/* For File Upload */
+.file-upload {
+    padding: 0 !important;
+}
+
+.custom-file-control.selected::after {
+  content: "" !important;
+}
+
+.custom-file {
+    overflow: hidden;
+}
+
+.custom-file-control {
+    white-space: nowrap;
+}

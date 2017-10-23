@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from BioinformaticsToolkit import utils
 
 # Create your views here.
 
@@ -8,15 +9,23 @@ def get_page(request):
 
 
 def algorithm(request):
-    string_1 = request.POST['string_1']
-    string_2 = request.POST['string_2']
+    # Read in fasta files
+    records_1 = utils.get_fasta_from_file(request.FILES['file_1'])
+    records_2 = utils.get_fasta_from_file(request.FILES['file_2'])
+    string_1 = None
+    string_2 = None
+    for record in records_1:
+        string_1 = record[1]
+    for record in records_2:
+        string_2 = record[1]
+
+    # Read in K parameter
     k_parameter = request.POST['k_tuple']
     if k_parameter is not None and k_parameter:
         k_parameter = int(k_parameter)
 
-    positions_table = {}
-
     # Build position table.
+    positions_table = {}
     for index, base in enumerate(string_1):
         if index + k_parameter > len(string_1):
             break

@@ -3,7 +3,7 @@
 {% block title %}K operation{% endblock %}
 
 {% block jumbotron_title %}K Operation{% endblock %}
-{% block jumbotron_subtitle %}Input the string and operand perform K operation: (use lowercase){% endblock %}
+{% block jumbotron_subtitle %}Input the string and operands to perform K operation: (use lowercase){% endblock %}
 
 {% block content %}
     <form action="/koperation/result/" method="post">
@@ -51,6 +51,7 @@
                 operand_2_filed.value = '';
             }
         }
+
         window.onload = change_input_field_mode();
     </script>
 {% endblock %}

@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from enum import Enum
+from BioinformaticsToolkit import utils
 
 # Create your views here.
 
@@ -70,8 +71,17 @@ def get_page(request):
 
 
 def algorithm(request):
-    string_1 = request.POST['string_1']
-    string_2 = request.POST['string_2']
+    # Read in fasta files
+    records_1 = utils.get_fasta_from_file(request.FILES['file_1'])
+    records_2 = utils.get_fasta_from_file(request.FILES['file_2'])
+    string_1 = None
+    string_2 = None
+    for record in records_1:
+        string_1 = record[1]
+    for record in records_2:
+        string_2 = record[1]
+
+    # Initialize score matrix.
     score_matrix = [[None] * (len(string_1) + 1) for i in range(len(string_2) + 1)]
 
     # Initialize the first element with 0.

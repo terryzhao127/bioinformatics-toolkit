@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from enum import Enum
+from BioinformaticsToolkit import utils
 
 # Create your views here.
 
@@ -70,8 +71,17 @@ def get_page(request):
 
 
 def algorithm(request):
-    string_1 = request.POST['string_1']
-    string_2 = request.POST['string_2']
+    # Read in fasta files
+    records_1 = utils.get_fasta_from_file(request.FILES['file_1'])
+    records_2 = utils.get_fasta_from_file(request.FILES['file_2'])
+    string_1 = None
+    string_2 = None
+    for record in records_1:
+        string_1 = record[1]
+    for record in records_2:
+        string_2 = record[1]
+
+    # Initialize score matrix.
     score_matrix = [[None] * (len(string_1) + 1) for i in range(len(string_2) + 1)]
 
     # Initialize the first element with 0.
@@ -93,13 +103,11 @@ def algorithm(request):
             gap_from_left = score_matrix[row][col - 1] + ALIGN_GAP
             score_matrix[row][col] = max(match_score, gap_from_above, gap_from_left, 0)
 
-    # Traceback to find the best partly alignment.
-
     # Find the start point.
     maximum = -1
     start_point = 0, 0
-    for row in range(len(string_2)):
-        for col in range(len(string_1)):
+    for row in range(len(score_matrix)):
+        for col in range(len(score_matrix[row])):
             if score_matrix[row][col] > maximum:
                 start_point = row, col
                 maximum = score_matrix[row][col]

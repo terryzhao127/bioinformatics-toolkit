@@ -3,18 +3,24 @@
 {% block title %}Box Plot{% endblock %}
 
 {% block jumbotron_title %}Box Plot{% endblock %}
-{% block jumbotron_subtitle %}Input two strings and required parameters to get their box-plot graph:{% endblock %}
+{% block jumbotron_subtitle %}Upload fasta files and input required parameters to get their box-plot graph:{% endblock %}
 
 {% block content %}
-    <form action="/boxplot/result/" method="post" class="text-left">
+    <form action="/boxplot/result/" enctype="multipart/form-data" method="post" class="text-left">
         {% csrf_token %}
-        <div class="form-group">
-            <label for="op-str-1">String 1:</label>
-            <input id="op-str-1" class="form-control" type="text" name="string_1" pattern="[acgt]+" required/>
+        <div class="form-group container file-upload">
+            <label>String 1:</label>
+            <label class="custom-file col-12">
+                <input type="file" id="op-str-1" name="file_1" class="custom-file-input form-control">
+                <span class="custom-file-control form-control-file"></span>
+            </label>
         </div>
-        <div class="form-group">
+        <div class="form-group container file-upload">
             <label for="op-str-2">String 2:</label>
-            <input id="op-str-2" class="form-control" type="text" name="string_2" pattern="[acgt]+" required/>
+            <label class="custom-file col-12">
+                <input type="file" id="op-str-2" name="file_2" class="custom-file-input form-control">
+                <span class="custom-file-control form-control-file"></span>
+            </label>
         </div>
         <div class="form-group">
             <label for="window-size">The size of window:</label>
@@ -32,4 +38,15 @@
             <button type="submit" class="btn btn-primary">Submit</button>
         </div>
     </form>
+{% endblock %}
+
+{# For uploading files... #}
+
+{% block additional_scripts %}
+    <script>
+        $('.custom-file-input').on('change', function () {
+            var fileName = $(this).val();
+            $(this).next('.form-control-file').addClass("selected").html(fileName);
+        });
+    </script>
 {% endblock %}
