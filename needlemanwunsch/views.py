@@ -4,8 +4,15 @@ from BioinformaticsToolkit import utils
 
 # Create your views here.
 
-# Define the scores of each alignment result.
-BLOSUM_62 = {
+# Define the substitution matrix.
+__BLAST = {
+    'a': {'a': 5, 't': -4, 'g': -4, 'c': -4},
+    't': {'a': -4, 't': 5, 'g': -4, 'c': -4},
+    'g': {'a': -4, 't': -4, 'g': 5, 'c': -4},
+    'c': {'a': -4, 't': -4, 'g': -4, 'c': 5},
+}
+
+__BLOSUM_62 = {
     's': {'s': 4, 'k': 0, 'q': 0, 'l': -2, '*': -4, 'h': -1, 'g': 0, 't': 1, 'p': -1, 'f': -2, 'b': 0, 'y': -2, 'm': -1,
           'w': -3, 'e': 0, 'z': 0, 'd': 0, 'i': -2, 'a': 1, 'c': -1, 'r': -1, 'n': 1, 'x': 0, 'v': -2},
     'k': {'s': 0, 'k': 5, 'q': 1, 'l': -2, '*': -4, 'h': -1, 'g': -2, 't': -1, 'p': -1, 'f': -3, 'b': 0, 'y': -2,
@@ -56,7 +63,8 @@ BLOSUM_62 = {
           'm': 1, 'w': -3, 'e': -2, 'z': -2, 'd': -3, 'i': 3, 'a': 0, 'c': -1, 'r': -3, 'n': -3, 'x': -1, 'v': 4}}
 
 # Define the score of gap.
-ALIGN_GAP = -4
+__PRO_ALIGN_GAP = -4
+__NC_ALIGN_GAP = -6
 
 
 # Define three results of alignment.
@@ -81,6 +89,16 @@ def algorithm(request):
     for record in records_2:
         string_2 = record[1]
 
+    # Select which sequence type to be process with.
+    seq_type = request.POST['seq_type']
+    seq_type = int(seq_type)
+    if seq_type == 0:
+        gap_penalty = __NC_ALIGN_GAP
+        sub_matrix = __BLAST
+    else:
+        gap_penalty = __PRO_ALIGN_GAP
+        sub_matrix = __BLOSUM_62
+
     # Initialize score matrix.
     score_matrix = [[None] * (len(string_1) + 1) for i in range(len(string_2) + 1)]
 
@@ -89,18 +107,18 @@ def algorithm(request):
 
     # Initialize the first row.
     for i in range(1, len(score_matrix[0])):
-        score_matrix[0][i] = score_matrix[0][i - 1] + ALIGN_GAP
+        score_matrix[0][i] = score_matrix[0][i - 1] + gap_penalty
 
     # Initialize the first column.
     for i in range(1, len(score_matrix)):
-        score_matrix[i][0] = score_matrix[i - 1][0] + ALIGN_GAP
+        score_matrix[i][0] = score_matrix[i - 1][0] + gap_penalty
 
     # Calculate the score matrix.
     for row in range(1, len(score_matrix)):
         for col in range(1, len(score_matrix[row])):
-            match_score = BLOSUM_62[string_2[row - 1]][string_1[col - 1]] + score_matrix[row - 1][col - 1]
-            gap_from_above = score_matrix[row - 1][col] + ALIGN_GAP
-            gap_from_left = score_matrix[row][col - 1] + ALIGN_GAP
+            match_score = sub_matrix[string_2[row - 1]][string_1[col - 1]] + score_matrix[row - 1][col - 1]
+            gap_from_above = score_matrix[row - 1][col] + gap_penalty
+            gap_from_left = score_matrix[row][col - 1] + gap_penalty
             score_matrix[row][col] = max(match_score, gap_from_above, gap_from_left)
 
     # Traceback to find the best alignment (using BFS).
@@ -124,14 +142,14 @@ def algorithm(request):
 
         # Three cases:
         row, col = temp_pos
-        if row - 1 >= 0 and score_matrix[row - 1][col] == score_matrix[row][col] - ALIGN_GAP:
+        if row - 1 >= 0 and score_matrix[row - 1][col] == score_matrix[row][col] - gap_penalty:
             colored_matrix[row - 1][col] = (colored_matrix[row - 1][col][0], True)
             new_string_1 = '-' + temp_string_1
             new_string_2 = string_2[row - 1] + temp_string_2
             new_pos = temp_pos[0] - 1, temp_pos[1]
             new_align_point = (new_pos, new_string_1, new_string_2)
             paths_queue.append(new_align_point)
-        if col - 1 >= 0 and score_matrix[row][col - 1] == score_matrix[row][col] - ALIGN_GAP:
+        if col - 1 >= 0 and score_matrix[row][col - 1] == score_matrix[row][col] - gap_penalty:
             colored_matrix[row][col - 1] = (colored_matrix[row][col - 1][0], True)
             new_string_1 = string_1[col - 1] + temp_string_1
             new_string_2 = '-' + temp_string_2
@@ -139,7 +157,7 @@ def algorithm(request):
             new_align_point = (new_pos, new_string_1, new_string_2)
             paths_queue.append(new_align_point)
         if row - 1 >= 0 and col - 1 >= 0 and score_matrix[row - 1][col - 1] == score_matrix[row][col] - \
-                BLOSUM_62[string_2[row - 1]][string_1[col - 1]]:
+                sub_matrix[string_2[row - 1]][string_1[col - 1]]:
             colored_matrix[row - 1][col - 1] = (colored_matrix[row - 1][col - 1][0], True)
             new_string_1 = string_1[col - 1] + temp_string_1
             new_string_2 = string_2[row - 1] + temp_string_2

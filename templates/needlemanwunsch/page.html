@@ -8,6 +8,16 @@
 {% block content %}
     <form action="/needlemanwunsch/result/" enctype="multipart/form-data" method="post" class="text-left">
         {% csrf_token %}
+        <div class="text-center">
+            <div class="btn-group margin-bottom-2" data-toggle="buttons">
+                <label class="btn btn-primary active">
+                    <input type="radio" name="seq_type" value="0" id="seq-type-0" autocomplete="off" checked> DNA
+                </label>
+                <label class="btn btn-primary">
+                    <input type="radio" name="seq_type" value="1" id="seq-type-1" autocomplete="off"> Protein
+                </label>
+            </div>
+        </div>
         <div class="form-group container file-upload">
             <label>String 1:</label>
             <label class="custom-file col-12">
