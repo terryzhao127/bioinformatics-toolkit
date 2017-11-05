@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'fasta.apps.FastaConfig',
     'needlemanwunsch.apps.NeedlemanwunschConfig',
     'smithwaterman.apps.SmithwatermanConfig',
+    'sensingmatrix.apps.SensingmatrixConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Sensing Matrix{% endblock %}
+
+{% block jumbotron_title %}Sensing Matrix{% endblock %}
+{% block jumbotron_subtitle %}Please fill required fields:{% endblock %}
+
+{% block content %}
+    <form action="/sensingmatrix/result/" enctype="multipart/form-data" method="post" class="text-left">
+        {% csrf_token %}
+        <div class="text-center">
+            <div class="btn-group margin-bottom-2" data-toggle="buttons">
+                <label class="btn btn-primary active">
+                    <input type="radio" name="method" value="0" id="seq-type-0" autocomplete="off" checked> Normal
+                    Sensing Matrix
+                </label>
+                <label class="btn btn-primary">
+                    <input type="radio" name="method" value="1" id="seq-type-1" autocomplete="off"> Probability
+                    Sensing Matrix
+                </label>
+            </div>
+        </div>
+        <div class="card px-4 py-4 mb-4">
+            <div class="card-block">
+                <h4 class="card-title text-muted mb-4">Train Sets</h4>
+                <div class="form-group container file-upload">
+                    <label for="train-set-functional">Functional Train Set:</label>
+                    <label class="custom-file col-12">
+                        <input type="file" id="train-set-functional" name="train-set-pos"
+                               class="custom-file-input form-control" required>
+                        <span class="custom-file-control form-control-file"></span>
+                    </label>
+                </div>
+                <div class="form-group container file-upload">
+                    <label for="train-set-nonfunctional">Nonfunctional Train Set:</label>
+                    <label class="custom-file col-12">
+                        <input type="file" id="train-set-nonfunctional" name="train-set-neg"
+                               class="custom-file-input form-control" required>
+                        <span class="custom-file-control form-control-file"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group container file-upload">
+            <label for="test-set">Test Set:</label>
+            <label class="custom-file col-12">
+                <input type="file" id="test-set" name="test-set" class="custom-file-input form-control" required>
+                <span class="custom-file-control form-control-file"></span>
+            </label>
+        </div>
+        <div class="form-group container">
+            <label for="threshold-functional">Threshold of Functional Locus:</label>
+            <input type="number" id="threshold-functional" name="threshold-pos"
+                   class="form-control" min="1" step="1" required>
+        </div>
+        <div class="form-group container">
+            <label for="threshold-nonfunctional">Threshold of Nonfunctional Locus:</label>
+            <input type="number" id="threshold-nonfunctional" name="threshold-neg"
+                   class="form-control" min="1" step="1" required>
+        </div>
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+{% endblock %}
+
+{# For uploading files... #}
+
+{% block additional_scripts %}
+    <script>
+        $('.custom-file-input').on('change', function () {
+            var fileName = $(this).val();
+            $(this).next('.form-control-file').addClass("selected").html(fileName);
+        });
+    </script>
+{% endblock %}

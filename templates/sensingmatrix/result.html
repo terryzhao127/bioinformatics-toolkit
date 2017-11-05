@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Sensing Matrix Result{% endblock %}
+
+{% block jumbotron_title %}Result of Sensing Matrix{% endblock %}
+{% block jumbotron_subtitle %}
+
+{% endblock %}
+
+{% block content %}
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th class="text-center">Sequence ID</th>
+            <th class="text-center">Scores</th>
+            <th class="text-center">Functional/Nonfunctional</th>
+        </tr>
+        </thead>
+        {% for score in scores %}
+            <tr>
+                <td>
+                    {{ score.2.0 }}
+                </td>
+                <td>
+                    {{ score.1 }}
+                </td>
+                <td>
+                    {% if score.0 == 0 %}
+                        Nonfunctional
+                    {% elif score.0 == 1 %}
+                        Functional
+                    {% else %}
+                        UNCLEAR
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
