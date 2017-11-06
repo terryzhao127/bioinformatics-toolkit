@@ -1,3 +1,4 @@
+import math
 from django.shortcuts import render
 from BioinformaticsToolkit import utils as my_utils
 import operator
@@ -17,31 +18,74 @@ def algorithm(request):
     test_set = my_utils.get_fasta_from_file(request.FILES['test-set'])
 
     # Process sequences.
+    data = {}
+    if method == 0:
+        matrix, length, test_results = __normal_sensing_matrix(test_set, train_set_pos, train_set_neg,
+                                                               threshold_pos, threshold_neg)
+        data['matrix'] = matrix
+    else:
+        matrices, length, test_results = __probability_sensing_matrix(test_set, train_set_pos,
+                                                                      train_set_neg, threshold_pos,
+                                                                      threshold_neg)
+        data['matrices'] = matrices
+    data['length'] = range(1, length + 1)
+    data['test_results'] = test_results
+    data['method'] = method
+
+    return render(request, 'sensingmatrix/result.html', data)
+
+
+# Two main algorithms...
+def __probability_sensing_matrix(test_set, train_set_pos,
+                                 train_set_neg, threshold_pos,
+                                 threshold_neg):
+    # Process sequences.
     pos_set_cut, neg_set_cut, test_set_cut = __align_sequences(train_set_pos, train_set_neg, test_set)
 
-    # Get Constructed Matrix
-    constructed_matrix = __construct_matrix(pos_set_cut, neg_set_cut, threshold_pos, threshold_neg)
+    # Get two sensing matrices.
+    matrices, length = __construct_matrices(pos_set_cut, neg_set_cut)
 
-    # Calculate scores
-    result_scores = []
+    # Calculate scores.
+    pos_matrix = matrices[0]
+    neg_matrix = matrices[1]
+    test_results = []
 
-    for seq, raw in zip(test_set_cut, test_set):
-        score = __calc_score(constructed_matrix, seq)
+    for seq, raw_seq in zip(test_set_cut, test_set):
+        score = __calc_score_probability(pos_matrix, neg_matrix, seq)
 
         if score <= threshold_neg:
-            result_scores.append((0, score, raw))
+            test_results.append((0, score, raw_seq))
         elif score >= threshold_pos:
-            result_scores.append((1, score, raw))
+            test_results.append((1, score, raw_seq))
         else:
-            result_scores.append((2, score, raw))
+            test_results.append((2, score, raw_seq))
 
-    result = {
-        'scores': result_scores,
-    }
-
-    return render(request, 'sensingmatrix/result.html', result)
+    return matrices, length, test_results
 
 
+def __normal_sensing_matrix(test_set, train_set_pos, train_set_neg, threshold_pos, threshold_neg):
+    # Process sequences.
+    pos_set_cut, neg_set_cut, test_set_cut = __align_sequences(train_set_pos, train_set_neg, test_set)
+
+    # Get sensing matrix.
+    matrix, length = __construct_matrix(pos_set_cut, neg_set_cut, threshold_pos, threshold_neg)
+
+    # Calculate scores.
+    test_results = []
+
+    for seq, raw_seq in zip(test_set_cut, test_set):
+        score = __calc_score_normal(matrix, seq)
+
+        if score <= threshold_neg:
+            test_results.append((0, score, raw_seq))
+        elif score >= threshold_pos:
+            test_results.append((1, score, raw_seq))
+        else:
+            test_results.append((2, score, raw_seq))
+    return matrix, length, test_results
+
+
+# Align sequences by cutting out preserving the common part.
 def __align_sequences(train_set_pos, train_set_neg, test_set):
     # Make the first sequence the base seq to calculate offsets.
     base_seq = train_set_pos[0][1]
@@ -130,29 +174,74 @@ def __fasta(seq_1, seq_2):
             return k
 
 
+# Construct matrices
+def __construct_matrices(pos_set, neg_set):
+    length = len(pos_set[0])
+
+    matrices = []
+
+    # Get two sensing matrices.
+    for my_set in (pos_set, neg_set):
+        temp_matrix = {x: [0] * length for x in 'actg'}
+
+        # Count frequencies.
+        for seq in my_set:
+            for index, base in enumerate(seq):
+                temp_matrix[base][index] += 1
+
+        # Calculate probability of each base present in some position.
+        result_matrix = {x: [0] * length for x in 'actg'}
+        for base, frequency_on_positions in temp_matrix.items():
+            # Calculate the total frequencies.
+            total_frequencies = sum(frequency_on_positions)
+
+            for index, frequency in enumerate(frequency_on_positions):
+                if total_frequencies == 0:
+                    result_matrix[base][index] = float('{0:.3f}'.format(0))
+                else:
+                    result_matrix[base][index] = float('{0:.3f}'.format(frequency / total_frequencies))
+
+        matrices.append(result_matrix)
+
+    return matrices, length
+
+
 def __construct_matrix(pos_set, neg_set, pos_threshold, neg_threshold):
     length = len(pos_set[0])
 
-    constructed_matrix = {x: [0 for i in range(length)] for x in 'actg'}
+    matrix = {x: [0] * length for x in 'actg'}
 
     # Train with positive set
     for seq in pos_set:
-        if __calc_score(constructed_matrix, seq) >= pos_threshold:
+        if __calc_score_normal(matrix, seq) >= pos_threshold:
             continue
         for index, base in enumerate(seq):
-            constructed_matrix[base][index] += 1
+            matrix[base][index] += 1
 
     # Train with negative set
     for seq in neg_set:
-        if __calc_score(constructed_matrix, seq) <= neg_threshold:
+        if __calc_score_normal(matrix, seq) <= neg_threshold:
             continue
         for index, base in enumerate(seq):
-            constructed_matrix[base][index] -= 1
-    return constructed_matrix
+            matrix[base][index] -= 1
+    return matrix, length
 
 
-def __calc_score(matrix, seq):
+# Calculate scores
+def __calc_score_normal(matrix, seq):
     score = 0
     for index, base in enumerate(seq):
         score += matrix[base][index]
     return score
+
+
+def __calc_score_probability(pos_matrix, neg_matrix, seq):
+    pos_score = 1
+    neg_score = 1
+    for index, base in enumerate(seq):
+        if pos_matrix[base][index] != 0:
+            pos_score *= pos_matrix[base][index]
+        if neg_matrix[base][index] != 0:
+            neg_score *= neg_matrix[base][index]
+
+    return math.log(pos_score / neg_score)

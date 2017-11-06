@@ -4,10 +4,69 @@
 
 {% block jumbotron_title %}Result of Sensing Matrix{% endblock %}
 {% block jumbotron_subtitle %}
-
+    Below are sensing matrix and result of each test query sequence.
 {% endblock %}
 
 {% block content %}
+    {% if method == 0 %}
+        <h3>Normal Sensing Matrix</h3>
+    {% else %}
+        <h3 class="mb-4">Probability Sensing Matrices</h3>
+    {% endif %}
+
+    {% if method == 0 %}
+        <div style="overflow: auto">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th></th>
+                    {% for i in length %}
+                        <th class="text-center">{{ i }}</th>
+                    {% endfor %}
+
+                </tr>
+                </thead>
+                {% for base in matrix.items %}
+                    <tr>
+                        <th class="text-center">{{ base.0.upper }}</th>
+                        {% for score in base.1 %}
+                            <td>{{ score }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% else %}
+        {% for matrix in matrices %}
+            {% if forloop.counter0 == 0 %}
+                <h5 class="text-left text-muted">Positive Sensing Matrix</h5>
+            {% else %}
+                <h5 class="text-left text-muted mt-4">Negative Sensing Matrix</h5>
+            {% endif %}
+            <div style="overflow: auto">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        {% for i in length %}
+                            <th class="text-center">{{ i }}</th>
+                        {% endfor %}
+
+                    </tr>
+                    </thead>
+                    {% for base in matrix.items %}
+                        <tr>
+                            <th class="text-center">{{ base.0.upper }}</th>
+                            {% for score in base.1 %}
+                                <td>{{ score }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% endfor %}
+    {% endif %}
+    <h3 class="mt-4 mb-1">Results of test queries</h3>
     <table class="table table-bordered">
         <thead>
         <tr>
@@ -16,18 +75,21 @@
             <th class="text-center">Functional/Nonfunctional</th>
         </tr>
         </thead>
-        {% for score in scores %}
+        {% for result in test_results %}
             <tr>
                 <td>
-                    {{ score.2.0 }}
+                    {# ID #}
+                    {{ result.2.0 }}
                 </td>
                 <td>
-                    {{ score.1 }}
+                    {# Score #}
+                    {{ result.1 }}
                 </td>
                 <td>
-                    {% if score.0 == 0 %}
+                    {# Judgement #}
+                    {% if result.0 == 0 %}
                         Nonfunctional
-                    {% elif score.0 == 1 %}
+                    {% elif result.0 == 1 %}
                         Functional
                     {% else %}
                         UNCLEAR
