@@ -3,6 +3,8 @@ from django.shortcuts import render
 from BioinformaticsToolkit import utils as my_utils
 import operator
 
+POSSIBILITY_OF_NOT_OCCURRING = 0.001
+
 
 def get_page(request):
     return render(request, 'sensingmatrix/page.html')
@@ -197,9 +199,10 @@ def __construct_matrices(pos_set, neg_set):
 
             for index, frequency in enumerate(frequency_on_positions):
                 if total_frequencies == 0:
-                    result_matrix[base][index] = float('{0:.3f}'.format(0))
+                    result_matrix[base][index] = float('{0:.3f}'.format(POSSIBILITY_OF_NOT_OCCURRING))
                 else:
-                    result_matrix[base][index] = float('{0:.3f}'.format(frequency / total_frequencies))
+                    result_matrix[base][index] = float(
+                        '{0:.3f}'.format(frequency / total_frequencies + POSSIBILITY_OF_NOT_OCCURRING))
 
         matrices.append(result_matrix)
 
