@@ -20,6 +20,7 @@ from django.shortcuts import redirect
 urlpatterns = [
     url(r'^$', lambda r: redirect('/index/')),
     url(r'^index/', include('index.urls')),
+    url(r'^cpgislands/', include('cpgislands.urls')),
     url(r'^koperation/', include('koperation.urls')),
     url(r'^fasta/', include('fasta.urls')),
     url(r'^boxplot/', include('boxplot.urls')),

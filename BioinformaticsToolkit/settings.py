@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'index.apps.IndexConfig',
+    'cpgislands.apps.CpgislandsConfig',
     'koperation.apps.KoperationConfig',
     'fasta.apps.FastaConfig',
     'needlemanwunsch.apps.NeedlemanwunschConfig',

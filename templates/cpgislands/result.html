@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}CpG island result{% endblock %}
+
+{% block jumbotron_title %}Result of
+    {% if work_type == 0 %}
+        Identification of
+    {% else %}
+        Finding
+    {% endif %}
+    CpG Islands{% endblock %}
+
+{% block jumbotron_subtitle %}
+    {% if work_type == 0 %}
+        Following are results on identifying whether a sequence is CpG island.
+    {% else %}
+        Following are results on finding the positions of CpG islands.
+    {% endif %}
+{% endblock %}
+
+{% block additional_stylesheets %}
+    <style>
+        .need-margin-bottom {
+            margin-bottom: 3em !important;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    {% if work_type == 0 %}
+        <h3>The positive matrix:</h3>
+        <div class="need-margin-bottom" style="overflow: auto">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th class="text-center">A</th>
+                    <th class="text-center">C</th>
+                    <th class="text-center">G</th>
+                    <th class="text-center">T</th>
+                </tr>
+
+                </thead>
+                {% for base, row in pos_matrix.items %}
+                    <tr>
+                        <td style="font-weight: bold;">{{ base.upper }}</td>
+                        <td>{{ row.a }}</td>
+                        <td>{{ row.c }}</td>
+                        <td>{{ row.g }}</td>
+                        <td>{{ row.t }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <h3>The negative matrix:</h3>
+        <div class="need-margin-bottom" style="overflow: auto">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th class="text-center">A</th>
+                    <th class="text-center">C</th>
+                    <th class="text-center">G</th>
+                    <th class="text-center">T</th>
+                </tr>
+
+                </thead>
+                {% for base, row in neg_matrix.items %}
+                    <tr>
+                        <td style="font-weight: bold;">{{ base.upper }}</td>
+                        <td>{{ row.a }}</td>
+                        <td>{{ row.c }}</td>
+                        <td>{{ row.g }}</td>
+                        <td>{{ row.t }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <h3>The test result of CpG islands:</h3>
+        <div style="overflow: auto">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th class="text-center">Sequence ID</th>
+                    <th class="text-center">Result of Identification</th>
+                    <th class="text-center">Value</th>
+                </tr>
+                </thead>
+                {% for seq_result in result %}
+                    <tr>
+                        <td>{{ seq_result.0.0 }}</td>
+                        <td>
+                            {% if seq_result.1 %}
+                                Yes
+                            {% else %}
+                                No
+                            {% endif %}
+                        </td>
+                        <td>{{ seq_result.2 }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% else %}
+        <h3>The joint matrix:</h3>
+        <div class="need-margin-bottom" style="overflow: auto">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th class="text-center">A+</th>
+                    <th class="text-center">C+</th>
+                    <th class="text-center">G+</th>
+                    <th class="text-center">T+</th>
+                    <th class="text-center">A-</th>
+                    <th class="text-center">C-</th>
+                    <th class="text-center">G-</th>
+                    <th class="text-center">T-</th>
+                </tr>
+
+                </thead>
+                {% for base, row in joint_matrix.items %}
+                    <tr>
+                        {% if base.1 == 'P' %}
+                            <td style="font-weight: bold;">{{ base.0.upper }}+</td>
+                        {% else %}
+                            <td style="font-weight: bold;">{{ base.0.upper }}-</td>
+                        {% endif %}
+                        <td>{{ row.aplus }}</td>
+                        <td>{{ row.cplus }}</td>
+                        <td>{{ row.gplus }}</td>
+                        <td>{{ row.tplus }}</td>
+                        <td>{{ row.aminus }}</td>
+                        <td>{{ row.cminus }}</td>
+                        <td>{{ row.gminus }}</td>
+                        <td>{{ row.tminus }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <h3>The result of finding CpG islands:</h3>
+        <div style="overflow: auto">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th class="text-center">Sequence ID</th>
+                    <th class="text-center">Sequence after decoding</th>
+                </tr>
+                </thead>
+                {% for seq_result in result %}
+                    <tr>
+                        <td>{{ seq_result.0.0 }}</td>
+                        <td class="text-center">
+                            <table style="margin: 0 auto;">
+                                <tr>
+                                    {% for base_state in seq_result.1 %}
+                                        {% if base_state.1 == 0 %}
+                                            <td style="background-color: yellow">
+                                                {{ base_state.0.upper }}
+                                            </td>
+                                        {% else %}
+                                            <td style="background-color: palegreen">
+                                                {{ base_state.0.upper }}
+                                            </td>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
+{% endblock %}

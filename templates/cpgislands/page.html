@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}CpG Islands{% endblock %}
+
+{% block jumbotron_title %}CpG Islands{% endblock %}
+{% block jumbotron_subtitle %}Please fill required fields:{% endblock %}
+
+{% block content %}
+    <form action="/cpgislands/result/" enctype="multipart/form-data"
+          method="post" class="text-left">
+        {% csrf_token %}
+        <div class="text-center">
+            <div class="btn-group margin-bottom-2" data-toggle="buttons">
+                <label class="btn btn-primary active">
+                    <input type="radio" name="work_type" value="0"
+                           id="work-type-0"
+                           autocomplete="off"
+                           onchange="change_input_field_mode()" checked>Identify
+                    CpG Islands
+                </label>
+                <label class="btn btn-primary">
+                    <input type="radio" name="work_type" value="1"
+                           id="work-type-1"
+                           autocomplete="off"
+                           onchange="change_input_field_mode()">Find CpG Islands
+                </label>
+            </div>
+        </div>
+        <div class="card px-4 py-4 mb-4">
+            <div class="card-block">
+                <h4 class="card-title text-muted mb-4">Train Sets</h4>
+                <div class="form-group container file-upload">
+                    <label for="train-set-pos">Positive
+                        Set:</label>
+                    <label class="custom-file col-12">
+                        <input type="file" id="train-set-pos"
+                               name="train-set-pos"
+                               class="custom-file-input form-control" required>
+                        <span class="custom-file-control form-control-file"></span>
+                    </label>
+                </div>
+                <div class="form-group container file-upload">
+                    <label for="train-set-neg">Negative
+                        Set:</label>
+                    <label class="custom-file col-12">
+                        <input type="file" id="train-set-neg"
+                               name="train-set-neg"
+                               class="custom-file-input form-control" required>
+                        <span class="custom-file-control form-control-file"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group container file-upload">
+            <label for="test-set">Test Set:</label>
+            <label class="custom-file col-12">
+                <input type="file" id="test-set" name="test-set"
+                       class="custom-file-input form-control" required>
+                <span class="custom-file-control form-control-file"></span>
+            </label>
+        </div>
+        <div class="form-group container">
+            <label for="threshold">Threshold of Identification</label>
+            <input type="number" id="threshold" name="threshold"
+                   class="form-control" min="0" required>
+        </div>
+        <div class="form-group container">
+            <label for="probability-p">Probability of transition in CpG
+                island:</label>
+            <input type="number" id="probability-p" name="probability-p"
+                   class="form-control" step="0.01" min="0" required>
+        </div>
+        <div class="form-group container">
+            <label for="probability-q">Probability of transition not in CpG
+                island:</label>
+            <input type="number" id="probability-q" name="probability-q"
+                   class="form-control" step="0.01" min="0" required>
+        </div>
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+{% endblock %}
+
+{# For uploading files... #}
+
+{% block additional_scripts %}
+    <script>
+        $('.custom-file-input').on('change', function () {
+            var fileName = $(this).val();
+            $(this).next('.form-control-file').addClass("selected").html(fileName);
+        });
+
+        function change_input_field_mode() {
+            var threshold = document.getElementById("threshold");
+            var probP = document.getElementById("probability-p");
+            var probQ = document.getElementById("probability-q");
+            if ($('input[name="work_type"]:checked').val() === '0') {
+                threshold.disabled = false;
+                probP.disabled = true;
+                probQ.disabled = true;
+            } else {
+                threshold.disabled = true;
+                probP.disabled = false;
+                probQ.disabled = false;
+            }
+        }
+        window.onload = change_input_field_mode();
+    </script>
+{% endblock %}
