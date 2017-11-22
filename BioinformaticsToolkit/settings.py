@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'phylogenetictree.apps.PhylogenetictreeConfig',
     'index.apps.IndexConfig',
     'cpgislands.apps.CpgislandsConfig',
     'koperation.apps.KoperationConfig',

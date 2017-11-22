@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Phylogenetic Tree{% endblock %}
+
+{% block jumbotron_title %}Draw Phylogenetic Tree{% endblock %}
+{% block jumbotron_subtitle %}Input organisms and age of their
+    fossils: {% endblock %}
+
+{% block content %}
+    <form action="{% url 'phylogenetictree:phylogenetic_tree_result' %}"
+          method="post">
+        {% csrf_token %}
+        <button class="btn btn-primary add_field_button mb-3"
+                style="margin: 0 auto">
+            Add More Fields
+        </button>
+        <div class="container row text-center input_fields_wrap">
+            <div class="form-group text-left col-md-6">
+                <label for="name-0">Organism Name:</label>
+                <input id="name-0" class="form-control" type="text"
+                       name="name-0" required/>
+            </div>
+            <div class="form-group text-left col-md-6">
+                <label for="age-0">Age:</label>
+                <input id="age-0" class="form-control" type="number"
+                       name="age-0" min="0" step="1" required/>
+            </div>
+        </div>
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block additional_scripts %}
+    <script>
+        $(document).ready(function () {
+            var max_fields = 100; //maximum input boxes allowed
+            var wrapper = $(".input_fields_wrap"); //Fields wrapper
+            var add_button = $(".add_field_button"); //Add button ID
+
+            var x = 0; //initlal text box count
+            $(add_button).click(function (e) { //on add input button click
+                e.preventDefault();
+                if (x < max_fields) { //max input box allowed
+                    x++; //text box increment
+                    $(wrapper).append('<div class="row" style="text-align:center !important;"><div class="form-group text-left col-md-5">\n' +
+                        '<label for="name-' + String(x) + '">Organism Name:</label>\n' +
+                        '<input id="name-' + String(x) + '" class="form-control" type="text"\n' +
+                        'name="name-' + String(x) + '" required/>\n' +
+                        '</div><div class="form-group text-left col-md-5">\n' +
+                        '<label for="age-' + String(x) + '">Age:</label>\n' +
+                        '<input id="age-' + String(x) + '" class="form-control" type="number"\n' +
+                        'name="age-' + String(x) + '" min="0" step="1" required/>\n' +
+                        '</div><a href="#" style="margin-top:1.4em" class="col-md-2 remove_field">Remove</a></div>'); //add input box
+                }
+            });
+
+            $(wrapper).on("click", ".remove_field", function (e) { //user click on remove text
+                e.preventDefault();
+                $(this).parent('div').remove();
+                x--;
+            })
+        });
+    </script>
+{% endblock %}

@@ -27,5 +27,6 @@ urlpatterns = [
     url(r'^needlemanwunsch/', include('needlemanwunsch.urls')),
     url(r'^smithwaterman/', include('smithwaterman.urls')),
     url(r'^sensingmatrix/', include('sensingmatrix.urls')),
+    url(r'^phylogenetictree/', include('phylogenetictree.urls')),
     url(r'^admin/', admin.site.urls),
 ]

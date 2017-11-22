@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Phylogenetic Tree{% endblock %}
+
+{% block jumbotron_title %}Result of Phylogenetic Tree:{% endblock %}
+{% block jumbotron_subtitle %}Following is the phylogenetic tree of your
+    input:{% endblock %}
+
+{% block content %}
+    <img src="{% url 'phylogenetictree:phylogenetic_tree' %}" class="img-fluid" alt="Fail"/>
+{% endblock %}
